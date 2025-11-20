@@ -1,6 +1,5 @@
-ideas.txt
-for_django_apps.txt
 task.pdf
 airport_tracker/airport_tracker/settings.py
 calma/
 others/
+*.pyc
