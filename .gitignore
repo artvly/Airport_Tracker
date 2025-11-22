@@ -3,3 +3,5 @@ airport_tracker/airport_tracker/settings.py
 calma/
 others/
 *.pyc
+node_modules/
+*.json
