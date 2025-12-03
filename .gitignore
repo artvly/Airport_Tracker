@@ -5,3 +5,5 @@ others/
 *.pyc
 node_modules/
 *.json
+*.sqlite3
+*.env
