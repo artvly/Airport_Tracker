@@ -20,7 +20,7 @@ from frontend import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='home'), #home,main
-    path('about/',views.about,name='home')
+    path('about/',views.about,name='about')
     # path('about/',)
     # main,about
 ]

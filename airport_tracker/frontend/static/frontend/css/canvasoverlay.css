@@ -1,0 +1,14 @@
+.CanvasOverlayContainer {
+  position: relative;
+}
+
+.OverlayText {
+  /* Текстовый элемент позиционируется абсолютно внутри контейнера */
+  position: absolute;
+  /* Разместите текст там, где вам нужно, например, по центру */
+  top: 50%;
+  left: 50%;
+  /* transform: translate(-50%, -50%);  */
+  /* Для точного центрирования */
+  color:aliceblue;
+}
