@@ -1,7 +1,7 @@
 // import {ChaoticShape} from '../utils/ChaoticShape.js';
 import React, { useRef, useState, useEffect } from 'react';
+import '../../css/bootstrap.css';
 import '../../css/canvasoverlay.css';
-
 
 const Particles = () => {
     const canvasRef = useRef(null);
@@ -265,17 +265,26 @@ const Particles = () => {
         if (e.key === 'Enter') {
             handleSearch(e);
         }
+  
+    };
+      const handle_about_btn=()=>{
+        window.location.href='/about/';
     };
 
     return (
         <div>
-             
             
-            <div className="CanvasOverlayContainer">
-                
+            {/* <div className="CanvasOverlayContainer">
                 <span className="OverlayText">One two three four WHEEERE HAVE U BEEEN</span>
-                
+            </div>  */}
+        
+            <div className="CanvasOverlayContainer">
+                <button className="overlay-button" onClick={handle_about_btn}>О нас</button>
+                <button className="overlay-button">Как пользоваться</button>
+                <button className="overlay-button">Доступные аэропорты</button>
+                <button className="overlay-button">В процессе</button>
             </div>
+
             <canvas ref={canvasRef} id="shapesCanvas"></canvas>
             <div className="search-container">    
                 <div className="search-input-wrapper">
