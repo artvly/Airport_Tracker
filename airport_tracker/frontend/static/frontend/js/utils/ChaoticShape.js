@@ -1,4 +1,5 @@
  // Класс хаотичной фигуры
+// import canvas from '../components/Particles.jsx'
 export class ChaoticShape {
             constructor() {
                 this.x = Math.random() * canvas.width;

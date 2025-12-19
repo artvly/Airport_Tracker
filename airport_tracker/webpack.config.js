@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: './frontend/static/frontend/js/app.jsx',
@@ -15,15 +16,22 @@ module.exports = {
 
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-react'],
+            presets: [
+              '@babel/preset-react'
+            ],
             plugins:["@babel/plugin-transform-modules-commonjs"]
 
           }
         }
+      },
+
+      { // НОВОЕ ПРАВИЛО ДЛЯ CSS
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
       }
     ]
   },
   resolve: {
     extensions: ['.js', '.jsx']
-  }
+  },
 };

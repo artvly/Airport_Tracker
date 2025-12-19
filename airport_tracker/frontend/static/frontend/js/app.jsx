@@ -1,4 +1,5 @@
-import ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom'
 import Particles from './components/Particles.jsx';
 
 const App = () => {
