@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import '../../css/bootstrap.css';
 import '../../css/canvasoverlay.css';
 
-const Particles = () => {
+const Particles = ({onMapClick}) => {
     const canvasRef = useRef(null);
     const [searchValue, setSearchValue] = useState('');
 
@@ -255,9 +255,11 @@ const Particles = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (searchValue.trim()) {
-            alert('Searching for: ' + searchValue);
-            setSearchValue('');
+        if (onMapClick) {
+                onMapClick();
+        } 
+        else {
+            window.location.href = '/map'; // Fallback
         }
     };
 
@@ -267,22 +269,23 @@ const Particles = () => {
         }
   
     };
-      const handle_about_btn=()=>{
+    const handle_about_btn=()=>{
         window.location.href='/about/';
     };
+    const handle_available_airports_btn=()=>{
+        window.location.href='/all_airports/';
+
+    };
+  
 
     return (
         <div>
             
-            {/* <div className="CanvasOverlayContainer">
-                <span className="OverlayText">One two three four WHEEERE HAVE U BEEEN</span>
-            </div>  */}
-        
             <div className="CanvasOverlayContainer">
                 <button className="overlay-button" onClick={handle_about_btn}>О нас</button>
-                <button className="overlay-button">Как пользоваться</button>
-                <button className="overlay-button">Доступные аэропорты</button>
-                <button className="overlay-button">В процессе</button>
+                <button className="overlay-button" >Как пользоваться</button>
+                <button className="overlay-button" onClick={handle_available_airports_btn}>Доступные аэропорты</button>
+                <button className="overlay-button" >В процессе</button>
             </div>
 
             <canvas ref={canvasRef} id="shapesCanvas"></canvas>
@@ -294,7 +297,6 @@ const Particles = () => {
                         placeholder="Search airports..."
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
-                        onKeyPress={handleKeyPress}
                     />
                     <button className="search-button" onClick={handleSearch}>
                         🔍

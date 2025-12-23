@@ -25,7 +25,22 @@ def available_airports(request):
         'form':form
     })
 
+def get_airport_coordinates(request, icao_code):
+    try:
+        airport = Airport.objects.get(icao_code=icao_code.upper())
+        return JsonResponse({
+            'name': airport.name,
+            'icao': airport.icao_code,
+            'latitude': airport.latitude,
+            'longitude': airport.longitude,
+            'city': airport.city,
+            'country': airport.country
+        })
+    except Airport.DoesNotExist:
+        return JsonResponse({'error': 'Аэропорт не найден'}, status=404)
 
+def airport_map_view(request):
+    return render(request, 'frontend/map.html')
 
 def search_results(request):
     # Обрабатывает отправку формы поиска
