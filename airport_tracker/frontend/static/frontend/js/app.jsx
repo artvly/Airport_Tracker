@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 const HomePageWrapper = () => {
     const history = useHistory(); // Работает потому что внутри Router
     const handle_onMapClick = () => {
-        console.log('🔄 Переход на /map');
+        console.log(' Переход на /map');
         history.push('/map');
     };
     return (
@@ -22,7 +22,7 @@ const App = () => (
     <Router>
         <Switch>
             <Route exact path="/" component={HomePageWrapper} />
-            <Route path="/map" component={AirportMapPage} />
+            <Route path="/map/" component={AirportMapPage} />
         </Switch>
     </Router>
 );

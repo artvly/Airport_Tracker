@@ -23,7 +23,7 @@ urlpatterns = [
     path('about/',views.about,name='about'), #о нас
     path('all_airports/', views.available_airports,name='available_airports'),#все доступные аэропорты
     path('all_airports/', include('frontend.urls') ),
-    path('api/airport-autocomplete/', views.autocomplete_airports, name='airport_autocomplete')
-
+    path('api/airport-autocomplete/', views.autocomplete_airports, name='airport_autocomplete'),
+    path('api/airport/<str:icao_code>/', views.get_airport_coordinates, name='airport_coordinates'),
     # path('api/', include('flights.urls')) 
 ]
