@@ -21,10 +21,11 @@ def aircraft_data(request):# API endpoint - отдает данные в JSON
         for state in states_data.states[:20]:  # Берем первые 20 самолетов
             aircraft_list.append({
                 'callsign': state.callsign.strip() if state.callsign else 'N/A',
-                'latitude': state.latitude,
-                'longitude': state.longitude,
-                'velocity': state.velocity,
-                'altitude': state.geo_altitude,
+                'icao24' : state.icao24
+                # 'latitude': state.latitude,
+                # 'longitude': state.longitude,
+                # 'velocity': state.velocity,
+                # 'altitude': state.geo_altitude,
             })
         
         return JsonResponse({'aircraft': aircraft_list})

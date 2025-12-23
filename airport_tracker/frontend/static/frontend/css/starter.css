@@ -1,0 +1,27 @@
+body { font-family: Arial; margin: 20px; }
+        h1 { color: #2c3e50; }
+        /* .search { margin: 20px 0; }
+        .search input { 
+            padding: 8px; 
+            width: 300px; 
+            border: 1px solid #ddd;
+        } */
+        .airport-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .airport-code {
+            font-weight: bold;
+            color: #3498db;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        .pagination a {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+        }

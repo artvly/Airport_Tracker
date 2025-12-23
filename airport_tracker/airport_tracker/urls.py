@@ -22,11 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='home'), #home,main
     path('about/',views.about,name='about'), #о нас
-    
-    path('flights/', include('flights.urls'))
+    path('all_airports/', views.available_airports,name='available_airports')#карта с полётами
 
 
     # path('api/', include('flights.urls')) 
-    # path('about/',)
-    # main,about
 ]

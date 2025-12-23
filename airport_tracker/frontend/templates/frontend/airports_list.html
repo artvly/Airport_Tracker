@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Аэропорты мира</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'frontend/css/starter.css' %}">
+</head>
+<body>
+    <h1>✈️ Список аэропортов</h1>
+    <p>Всего: {{ total_airports }} аэропортов</p>
+    
+    {% for airport in page_obj %}
+    <div class="airport-card">
+        <h3>
+            <span class="airport-code">{{ airport.icao_code }}</span>
+            {% if airport.iata_code %}
+            <span class="airport-code">({{ airport.iata_code }})</span>
+            {% endif %}
+            — {{ airport.name }}
+        </h3>
+        <p>{{ airport.city }}, {{ airport.country }}</p>
+        <p>Координаты: {{ airport.latitude|floatformat:4 }}, {{ airport.longitude|floatformat:4 }}</p>
+        <small>
+            <a href="https://maps.google.com/?q={{ airport.latitude }},{{ airport.longitude }}" target="_blank">
+                📍 Показать на карте
+            </a>
+        </small>
+    </div>
+    {% endfor %}
+    
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+        {% endif %}
+        
+        <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Вперед →</a>
+        {% endif %}
+    </div>
+</body>
+</html>
