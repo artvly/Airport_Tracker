@@ -1,5 +1,5 @@
-# from django.urls import path
-# from . import views
-# urlpatterns=[
-#     path('all_airports/', views.availabe_airports, name='all_airports')
-# ]
+from django.urls import path
+from . import views
+urlpatterns=[
+    path('search/', views.search_results, name='search_results'),
+]

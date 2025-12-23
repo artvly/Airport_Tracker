@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <title>Результаты поиска</title>
+</head>
+<body>
+    <h1>Результаты поиска</h1>
+    
+    <form method="get" action="{% url 'search_results' %}">
+        {{ form.search }}
+        <button type="submit">Найти</button>
+    </form>
+    
+    <div id="suggestions-container"></div>
+    
+    {% if query %}
+        <p>Найдено: {{ total_results }} по запросу "{{ query }}"</p>
+    {% endif %}
+    
+    {% for airport in page_obj %}
+        <div>
+            <h3>{{ airport.name }} ({{ airport.icao_code }})</h3>
+            <p>{{ airport.city }}, {{ airport.country }}</p>
+        </div>
+    {% endfor %}
+    
+    <script src="{% static 'frontend/js/autocomplete.js' %}"></script>
+</body>
+</html>

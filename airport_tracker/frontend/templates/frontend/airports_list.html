@@ -7,9 +7,18 @@
 </head>
 <body>
     <h1>✈️ Список аэропортов</h1>
-    <p>Всего: {{ total_airports }} аэропортов</p>
+    <p class="h1">Всего: {{ total_airports }} аэропортов</p>
     
+    
+    <form method="get" action="{% url 'search_results' %}">
+        {{ form.search }}
+        <button type="submit">Найти</button>
+    </form>
+
+    <div id="suggestions-container"></div>
+
     {% for airport in page_obj %}
+    
     <div class="airport-card">
         <h3>
             <span class="airport-code">{{ airport.icao_code }}</span>
@@ -39,5 +48,6 @@
             <a href="?page={{ page_obj.next_page_number }}">Вперед →</a>
         {% endif %}
     </div>
+     <script src="{% static 'frontend/js/autocomplete.js' %}"></script>
 </body>
 </html>

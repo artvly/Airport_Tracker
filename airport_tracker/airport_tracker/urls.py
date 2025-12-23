@@ -17,13 +17,13 @@ from django.contrib import admin
 from django.urls import path,include
 from frontend import views
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='home'), #home,main
     path('about/',views.about,name='about'), #о нас
-    path('all_airports/', views.available_airports,name='available_airports')#карта с полётами
-
+    path('all_airports/', views.available_airports,name='available_airports'),#все доступные аэропорты
+    path('all_airports/', include('frontend.urls') ),
+    path('api/airport-autocomplete/', views.autocomplete_airports, name='airport_autocomplete')
 
     # path('api/', include('flights.urls')) 
 ]
