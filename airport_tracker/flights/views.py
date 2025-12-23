@@ -1,10 +1,33 @@
+import asyncio
+from python_opensky import OpenSky
+from django.http import JsonResponse
 from django.shortcuts import render
 
-from rest_framework import viewsets
-from .models import Flight
-from .serializers import ItemSerializer
+async def fetch_aircraft():# Асинхронная функция для получения данных
+    
+    async with OpenSky() as opensky:# Запрашиваем все самолеты над Европой
+        states = await opensky.get_states()
+        return states
 
-class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Flight.objects.all()
-    serializer_class = ItemSerializer
-# Create your views here.
+# def aircraft_map(request): # Основная view - показывает карту
+#     return render(request, 'flight_tracker/map.html')
+
+def aircraft_data(request):# API endpoint - отдает данные в JSON
+    
+    try:
+        states_data = asyncio.run(fetch_aircraft())
+        # Преобразуем в простой список словарей
+        aircraft_list = []
+        for state in states_data.states[:20]:  # Берем первые 20 самолетов
+            aircraft_list.append({
+                'callsign': state.callsign.strip() if state.callsign else 'N/A',
+                'latitude': state.latitude,
+                'longitude': state.longitude,
+                'velocity': state.velocity,
+                'altitude': state.geo_altitude,
+            })
+        
+        return JsonResponse({'aircraft': aircraft_list})
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -1,10 +1,7 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ItemViewSet
-
-router = DefaultRouter()
-router.register(r'items', ItemViewSet)
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-]
+    # path('', views.aircraft_map, name='map'),
+    path('data/', views.aircraft_data, name='data'),
+]   

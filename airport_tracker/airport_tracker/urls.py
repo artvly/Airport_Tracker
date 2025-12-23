@@ -21,8 +21,12 @@ from frontend import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='home'), #home,main
-    path('about/',views.about,name='about'),
-    path('api/', include('flights.urls'))
+    path('about/',views.about,name='about'), #о нас
+    
+    path('flights/', include('flights.urls'))
+
+
+    # path('api/', include('flights.urls')) 
     # path('about/',)
     # main,about
 ]
