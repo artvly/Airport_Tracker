@@ -2,14 +2,102 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport_about" content="width=device-width, initial-scale=1.0">
-    <title>Airport Search</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'frontend/css/particles.css' %}">
+    <title>О проекте</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        p {
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #95a5a6;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="header">
+        <h1>О проекте SkyTracker</h1>
+        <h1>
+        <img width="48" height="48" src="https://img.icons8.com/emoji/48/airplane-emoji.png" 
+        alt="airplane-emoji" onclick="window.location.href='../'" onmouseover="this.style.cursor='pointer';"/>
+         Список аэропортов
+        </h1>
+        <p class="tagline">Отслеживание авиарейсов в реальном времени</p>
+    </div>
     
-    <!-- <script src="{% static 'frontend/dist/bundle.js' %}"></script> -->
+    <div class="section">
+        <h2><span class="icon">🎯</span> Наша миссия</h2>
+        <p>Сделать данные о воздушном движении доступными и понятными.</p>
+        <p>Мы показываем информацию о рейсах и аэропортах в удобном формате.</p>
+    </div>
+    
+    <div class="section">
+        <h2><span class="icon">✨</span> Что мы делаем</h2>
+        <p>• Отслеживаем рейсы в реальном времени</p>
+        <p>• Показываем аэропорты на карте</p>
+        <p>• Ищем аэропорты по названию или коду</p>
+        <p>• Анализируем воздушное движение</p>
+    </div>
+    
+    <div class="section">
+        <h2><span class="icon">👥</span> Для кого это</h2>
+        <p>• Любители авиации</p>
+        <p>• Путешественники</p>
+        <p>• Студенты и исследователи</p>
+    </div>
+    
+    <div class="section">
+        <h2><span class="icon">⚙️</span> Технологии</h2>
+        <p>Django • OpenSky API • Leaflet карты</p>
+    </div>
+    
+    <div class="footer">
+        <p>© 2024 SkyTracker Project</p>
+        <p>Данные предоставлены OpenSky Network</p>
+    </div>
 </body>
 </html>

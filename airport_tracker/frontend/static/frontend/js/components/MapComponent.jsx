@@ -184,6 +184,116 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flight
                 markerLayer.current.getSource().addFeature(marker);
             }
         });
+
+        if (centerAirport && flights.length > 0) {
+    console.log(`Рисуем ${flights.length} линий рейсов`);
+    
+    const centerCoords = fromLonLat([
+        centerAirport.longitude, 
+        centerAirport.latitude
+    ]);
+    
+    // Создаем Map для быстрого поиска аэропортов по ICAO
+    const airportMap = {};
+    airports.forEach(airport => {
+        airportMap[airport.icao] = airport;
+    });
+    
+    flights.forEach((flight, index) => {
+        try {
+            // Определяем аэропорты для этой линии
+            let fromAirport, toAirport;
+            
+            if (flight.from_icao === centerAirport.icao) {
+                // Рейс ИЗ центрального аэропорта
+                fromAirport = centerAirport;
+                toAirport = airportMap[flight.to_icao];
+            } else if (flight.to_icao === centerAirport.icao) {
+                // Рейс В центральный аэропорт
+                fromAirport = airportMap[flight.from_icao];
+                toAirport = centerAirport;
+            } else {
+                // Пропускаем рейсы, не связанные с центральным аэропортом
+                return;
+            }
+            
+            if (!fromAirport || !toAirport) {
+                console.warn(`Не найден аэропорт для рейса ${flight.callsign}`);
+                return;
+            }
+            
+            const fromCoords = fromLonLat([fromAirport.longitude, fromAirport.latitude]);
+            const toCoords = fromLonLat([toAirport.longitude, toAirport.latitude]);
+            
+            // Создаем кривую линию (простая версия без сложных вычислений)
+            const createCurvedLine = (start, end) => {
+                const points = [];
+                const steps = 20;
+                
+                const dx = end[0] - start[0];
+                const dy = end[1] - start[1];
+                const midX = (start[0] + end[0]) / 2;
+                const midY = (start[1] + end[1]) / 2;
+                
+                // Создаем небольшой изгиб
+                const controlX = midX + dy * 0.2;
+                const controlY = midY - dx * 0.2;
+                
+                // Квадратичная кривая Безье
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / steps;
+                    
+                    const x = (1 - t) * (1 - t) * start[0] + 
+                              2 * (1 - t) * t * controlX + 
+                              t * t * end[0];
+                    
+                    const y = (1 - t) * (1 - t) * start[1] + 
+                              2 * (1 - t) * t * controlY + 
+                              t * t * end[1];
+                    
+                    points.push([x, y]);
+                }
+                
+                return points;
+            };
+            
+            const curvePoints = createCurvedLine(fromCoords, toCoords);
+            
+            const flightLine = new Feature({
+                geometry: new LineString(curvePoints),
+                flightData: {
+                    callsign: flight.callsign,
+                    from: flight.from_icao,
+                    to: flight.to_icao,
+                    type: flight.type
+                }
+            });
+            
+            // Определяем цвет линии
+            const getLineColor = () => {
+                if (flight.type === 'departure') return 'rgba(199, 54, 37, 0.7)'; // Красный для вылетов
+                if (flight.type === 'arrival') return 'rgba(29, 188, 95, 0.7)'; // Зеленый для прилетов
+                return 'rgba(52, 152, 219, 0.7)'; // По умолчанию - синий
+            };
+            
+            // Стиль для линии рейса
+            flightLine.setStyle(new Style({
+                stroke: new Stroke({
+                    color: getLineColor(),
+                    width: 2,
+                    // lineDash: [5, 5],
+                    lineCap: 'round'
+                })
+            }));
+            
+            flightsLayer.current.getSource().addFeature(flightLine);
+            
+        } catch (error) {
+            console.error(`Ошибка при создании линии для рейса:`, error);
+        }
+    });
+}
+
         // Центрируем карту на центральном аэропорте
         if (centerAirport) {
             const zoomLevel = radius > 1000 ? 5 : radius > 500 ? 6 : radius > 200 ? 7 : 8;
@@ -227,8 +337,7 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flight
                 position: 'relative',
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                 cursor: 'pointer'
-            }} 
-        >
+            }}>
 
                 
         </div>

@@ -9,11 +9,16 @@ const [selectedAirport, setSelectedAirport] = useState(null); // Только о
 const [loading, setLoading] = useState(false);
 const [radius, setRadius] = useState(100);
 
+
 const [airportsInRadius, setAirportsInRadius] = useState([]);
 const [loadingAirports, setLoadingAirports] = useState(false);
 
 const suggestionsRef = useRef(null);
 const inputRef = useRef(null);
+
+
+const [flights, setFlights] = useState([]);
+const [loadingFlights, setLoadingFlights] = useState(false);
 
 // Функция для получения подсказок
 const fetchSuggestions = async (query) => {
@@ -61,10 +66,48 @@ const fetchAirportsInRadius = async () => {
         setLoadingAirports(false);
     }
 };
+
+const fetchFlights = async () => {
+    if (!selectedAirport) {
+        setFlights([]);
+        return;
+    }
+    
+    setLoadingFlights(true);
+    console.log(`Запрашиваем рейсы для ${selectedAirport.icao} с радиусом ${radius}км`);
+    
+    try {
+        // Используем ваш API для получения рейсов
+        const response = await fetch(
+            `/api/flights-with-radius/?center_icao=${selectedAirport.icao}&radius=${radius}`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Данные рейсов получены:', data);
+        
+        if (data.success) {
+            setFlights(data.flights || []);
+        } else {
+            console.error('API вернул ошибку:', data.error);
+            setFlights([]);
+        }
+        
+    } catch (error) {
+        console.error('Ошибка получения рейсов:', error);
+        setFlights([]);
+    } finally {
+        setLoadingFlights(false);
+    }
+};
 //при изменении радиуса или аэропорта все расстояния пересчитываем
 useEffect(() => {
     if (selectedAirport && radius > 0) {
         fetchAirportsInRadius();
+        fetchFlights();
     }
 }, [selectedAirport, radius]);
 
@@ -231,7 +274,8 @@ const handleKeyDown = (e) => {
             </div>
         )}
         <div style={{ color: '#2ecc71', fontWeight: 'bold' }}>
-                 Найдено: {airportsInRadius.length} аэропортов
+                Найдено: {airportsInRadius.length} аэропортов
+                Найдено рейсов: {flights.length}
         </div>
 
 
@@ -243,6 +287,7 @@ const handleKeyDown = (e) => {
                     airports={selectedAirport ? [selectedAirport, ...airportsInRadius] : []}
                     radius={radius} // ← передаем значение радиуса
                     centerAirport={selectedAirport} // ← опционально, для будущих улучшений
+                    flights={flights} 
                  />
             </div>
 
