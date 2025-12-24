@@ -101,7 +101,9 @@ def autocomplete_airports(request):
             'name': airport.name,
             'city': airport.city,
             'country': airport.country,  # Две буквы: "RU", "US" и т.д.
-            'icao': airport.icao_code
+            'icao': airport.icao_code,
+            'longitude':airport.longitude,
+            'latitude':airport.latitude
         })
     
 
