@@ -7,9 +7,9 @@ const [searchValue, setSearchValue] = useState('');//значение с пои�
 const [suggestions, setSuggestions] = useState([]);
 const [selectedAirport, setSelectedAirport] = useState(null); // Только один!
 const [loading, setLoading] = useState(false);
+const [radius, setRadius] = useState(100);
 const suggestionsRef = useRef(null);
 const inputRef = useRef(null);
-const [radius, setRadius] = useState(100);
 
 // Функция для получения подсказок
 const fetchSuggestions = async (query) => {
@@ -132,9 +132,9 @@ const handleKeyDown = (e) => {
                                         style={suggestionItemStyle}
                                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f8ff'}
                                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}>
-                                        <div style={{ fontWeight: 'bold' }}>
+                                        <div style={{ fontWeight: 'bold' ,color:'#3498db'}}>
                                             {airport.name} 
-                                            <span style={{ marginLeft: '10px', fontFamily: 'monospace', color: '#3498db'
+                                            <span style={{ marginLeft: '10px', fontFamily: 'monospace', color: '#004878ff'
                                             }}>
                                                 {airport.icao}
                                             </span>
@@ -171,7 +171,7 @@ const handleKeyDown = (e) => {
                 
 
                 {/* Подсказка под полем */}
-                <div style={{ fontSize: '0.9em', color: '#7f8c8d', marginTop: '5px' }}>
+                <div style={{ fontSize: '0.9em', color: '#3498db', marginTop: '5px' }}>
                     {selectedAirport 
                         ? `Выбран: ${selectedAirport.name} (${selectedAirport.icao})`
                         : 'Примеры: "Moscow", "UUEE", "New York", "Heathrow"'
@@ -204,14 +204,18 @@ const handleKeyDown = (e) => {
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}> 
         {/* Карта занимает большую часть */}
             <div style={{ flex: 1 }}>
-                <MapComponent airports={selectedAirport ? [selectedAirport] : []} />
+                <MapComponent 
+                    airports={selectedAirport ? [selectedAirport] : []}
+                    radius={radius} // ← передаем значение радиуса
+                    centerAirport={selectedAirport} // ← опционально, для будущих улучшений
+                 />
             </div>
 
 
             {/* Вертикальный ползунок справа от карты */}
             {selectedAirport && (
                 <div style={sliderContainerStyle}>
-                    <div style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' ,color:'#3498db'}}>
                         Радиус: {radius} км
                     </div>
                     <input

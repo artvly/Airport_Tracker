@@ -10,12 +10,14 @@ import { Style, Icon, Stroke, Fill, Circle as CircleStyle } from 'ol/style';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 
-const MapComponent = ({ airports = [], centerAirport = null, radius = 500, flights = [] }) => {
+const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flights = [] }) => {
+   
     const mapRef = useRef();
     const mapInstance = useRef(null);
     const airportsLayer = useRef(null);
     const flightsLayer = useRef(null);
     const radiusLayer = useRef(null);
+    const markerLayer = useRef(null);
 
     // Функция для расчета координат круга радиуса
     const createRadiusCircle = (centerLonLat, radiusKm) => {
@@ -52,6 +54,7 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 500, fligh
 
     useEffect(() => {
         // Инициализация карты
+        
         if (!mapInstance.current) {
             console.log('🗺️ Инициализируем карту OpenLayers');
             
@@ -97,11 +100,19 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 500, fligh
                 })
             });
 
+            markerLayer.current = new VectorLayer({
+                source: new VectorSource()
+            });
+
+            mapInstance.current.addLayer(markerLayer.current);
             mapInstance.current.addLayer(airportsLayer.current);
             mapInstance.current.addLayer(flightsLayer.current);
             mapInstance.current.addLayer(radiusLayer.current);
         }
-
+        // Очищаем старые маркеры
+        if (markerLayer.current) {
+            markerLayer.current.getSource().clear();
+        }
         // Очищаем старые данные
         airportsLayer.current.getSource().clear();
         flightsLayer.current.getSource().clear();
@@ -119,68 +130,29 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 500, fligh
             radiusLayer.current.getSource().addFeature(radiusFeature);
         }
 
-        // Добавляем аэропорты
-        // airports.forEach(airport => {
-        //     if (airport.latitude && airport.longitude) {
-        //         const isCenter = centerAirport && airport.icao === centerAirport.icao;
-                
-        //         const marker = new Feature({
-        //             geometry: new Point(
-        //                 fromLonLat([airport.longitude, airport.latitude])
-        //             ),
-        //             name: airport.name,
-        //             icao: airport.icao,
-        //             isCenter: isCenter
-        //         });
+        // Добавляем маркер для центрального аэропорта (если он есть)
+        if (centerAirport && centerAirport.latitude && centerAirport.longitude) {
+           
+            const centerMarker = new Feature({
+                geometry: new Point(
+                    fromLonLat([centerAirport.longitude, centerAirport.latitude])
+                ),
+                name: centerAirport.name
+            });
 
-        //         // Стиль для центрального аэропорта и обычных
-        //         const style = new Style({
-        //             image: new CircleStyle({
-        //                 radius: isCenter ? 10 : 6,
-        //                 fill: new Fill({
-        //                     color: isCenter ? '#e74c3c' : '#3498db'
-        //                 }),
-        //                 stroke: new Stroke({
-        //                     color: isCenter ? '#c0392b' : '#2980b9',
-        //                     width: isCenter ? 3 : 2
-        //                 })
-        //             }),
-        //             text: new Style({
-        //                 text: airport.icao,
-        //                 font: 'bold 12px Arial',
-        //                 fill: new Fill({
-        //                     color: isCenter ? '#c0392b' : '#2c3e50'
-        //                 }),
-        //                 offsetY: isCenter ? -15 : -12,
-        //                 stroke: new Stroke({
-        //                     color: 'white',
-        //                     width: 3
-        //                 })
-        //             })
-        //         });
+            // Стиль для центрального аэропорта (красный)
+            centerMarker.setStyle(new Style({
+                image: new Icon({
+                    src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // или другая иконка
+                    scale: 0.15, // чуть больше обычных
+                    anchor: [0.5, 1],
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'fraction'
+                })
+            }));
 
-        //         marker.setStyle(style);
-        //         airportsLayer.current.getSource().addFeature(marker);
-        //     }
-        // });
-
-        // Добавляем линии рейсов
-        // flights.forEach(flight => {
-        //     const sourceAirport = airports.find(a => a.icao === flight.source);
-        //     const destAirport = airports.find(a => a.icao === flight.destination);
-            
-        //     if (sourceAirport && destAirport) {
-        //         const line = new Feature({
-        //             geometry: new LineString([
-        //                 fromLonLat([sourceAirport.longitude, sourceAirport.latitude]),
-        //                 fromLonLat([destAirport.longitude, destAirport.latitude])
-        //             ]),
-        //             flightInfo: flight
-        //         });
-
-        //         flightsLayer.current.getSource().addFeature(line);
-        //     }
-        // });
+            markerLayer.current.getSource().addFeature(centerMarker);
+        }
 
         // Центрируем карту на центральном аэропорте
         if (centerAirport) {
