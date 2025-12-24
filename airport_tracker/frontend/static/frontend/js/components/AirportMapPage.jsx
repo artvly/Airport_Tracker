@@ -2,107 +2,116 @@ import React, { useState, useEffect, useRef} from 'react';
 import MapComponent from './MapComponent';
 
  
- const AirportMapPage = ({history}) => {
-    const [searchValue, setSearchValue] = useState('');//значение с поисковика в данный момент времени
-    const [suggestions, setSuggestions] = useState([]);
-    const [selectedAirport, setSelectedAirport] = useState(null); // Только один!
-    const [loading, setLoading] = useState(false);
-    const suggestionsRef = useRef(null);
-    const inputRef = useRef(null);
+const AirportMapPage = ({history}) => {
+const [searchValue, setSearchValue] = useState('');//значение с поисковика в данный момент времени
+const [suggestions, setSuggestions] = useState([]);
+const [selectedAirport, setSelectedAirport] = useState(null); // Только один!
+const [loading, setLoading] = useState(false);
+const suggestionsRef = useRef(null);
+const inputRef = useRef(null);
+const [radius, setRadius] = useState(100);
 
-    // Функция для получения подсказок
-    const fetchSuggestions = async (query) => {
-        if (query.length < 2) {
-            setSuggestions([]);
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await fetch(
-                 `/api/airport-autocomplete/?q=${encodeURIComponent(query)}`
-            );
-            
-            if (!response.ok) throw new Error('API error');
-            
-            const data = await response.json();
-            setSuggestions(data.results || []);
-        } catch (error) {
-            console.error('Autocomplete error:', error);
-            setSuggestions([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Дебаунс для запросов
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchSuggestions(searchValue);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchValue]);
-
-    // Клик вне подсказок - скрываем их
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (suggestionsRef.current && 
-                !suggestionsRef.current.contains(event.target) &&
-                inputRef.current && 
-                !inputRef.current.contains(event.target)) {
-                setSuggestions([]);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Выбор аэропорта из подсказок
-    const handleSelectAirport = (airport) => {
-        const airportWithCoords = {
-            name: airport.name,
-            icao: airport.icao,
-            latitude: airport.latitude || 0,
-            longitude: airport.longitude || 0,
-            city: airport.city,
-            country: airport.country
-        };
-        
-        setSelectedAirport(airportWithCoords); // Заменяем, а не добавляем
-        setSearchValue(airport.name); // Показываем название в поле
+// Функция для получения подсказок
+const fetchSuggestions = async (query) => {
+    if (query.length < 2) {
         setSuggestions([]);
-    };
+        return;
+    }
 
-    // Очистка выбранного аэропорта
-    const handleClearAirport = () => {
-        setSelectedAirport(null);
-        setSearchValue('');
-    };
+    setLoading(true);
+    try {
+        const response = await fetch(
+                `/api/airport-autocomplete/?q=${encodeURIComponent(query)}`
+        );
+        
+        if (!response.ok) throw new Error('API error');
+        
+        const data = await response.json();
+        setSuggestions(data.results || []);
+    } catch (error) {
+        console.error('Autocomplete error:', error);
+        setSuggestions([]);
+    } finally {
+        setLoading(false);
+    }
+};
 
-    // Обработка клавиш (ESC - скрыть подсказки, Enter - выбрать первую подсказку)
-    const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
+// Дебаунс для запросов
+useEffect(() => {
+    const timer = setTimeout(() => {
+        fetchSuggestions(searchValue);
+    }, 300);
+
+    return () => clearTimeout(timer);
+}, [searchValue]);
+
+// Клик вне подсказок - скрываем их
+useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (suggestionsRef.current && 
+            !suggestionsRef.current.contains(event.target) &&
+            inputRef.current && 
+            !inputRef.current.contains(event.target)) {
             setSuggestions([]);
         }
-        if (e.key === 'Enter' && suggestions.length > 0) {
-            handleSelectAirport(suggestions[0]);
-        }
     };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
+
+
+//изменение радиуса 
+const handleRadiusChange = (e) => {
+    setRadius(parseInt(e.target.value));
+};
+// Выбор аэропорта из подсказок
+const handleSelectAirport = (airport) => {
+    const airportWithCoords = {
+        name: airport.name,
+        icao: airport.icao,
+        latitude: airport.latitude || 0,
+        longitude: airport.longitude || 0,
+        city: airport.city,
+        country: airport.country
+    };
+
+
+    
+    setSelectedAirport(airportWithCoords); // Заменяем, а не добавляем
+    setSearchValue(airport.name); // Показываем название в поле
+    setSuggestions([]);
+};
+
+// Очистка выбранного аэропорта
+const handleClearAirport = () => {
+    setSelectedAirport(null);
+    setSearchValue('');
+};
+
+// Обработка клавиш (ESC - скрыть подсказки, Enter - выбрать первую подсказку)
+const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+        setSuggestions([]);
+    }
+    if (e.key === 'Enter' && suggestions.length > 0) {
+        handleSelectAirport(suggestions[0]);
+    }
+};
     return (
-         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-                 <h1 onClick={()=>(history.push('/'))} 
-                    style={{ color: '#ddd', marginBottom: '30px'}}>
-                <img 
-                    src="https://img.icons8.com/emoji/48/airplane-emoji.png" 
-                    alt="Назад на главную"
-                    onMouseOver={(e) => e.currentTarget.style.cursor = 'pointer'}/>
+    
+        <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+                <h1 onClick={()=>(history.push('/'))} 
+                style={{ color: '#ddd', marginTop: '60px'}}> {/**/}
+            <img src="https://img.icons8.com/emoji/48/airplane-emoji.png" alt="Назад на главную"
+                onMouseOver={(e) => e.currentTarget.style.cursor = 'pointer'}/>
                 Карта аэропортов</h1>
+
+
             {/* Поиск с автоподсказками */}
-            <div style={{ position: 'relative', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <div style={{ position: 'relative','flex':1}}>
+            <div style={{ position: 'relative', marginBottom: '20px' }} > {/*2*/}
+                <div style={{ display: 'flex' }}>
+                    <div style={{ position: 'relative',width:'100%'}}>
                         <input ref={inputRef} type="text" 
                             placeholder={selectedAirport ? "Аэропорт выбран" : "Начните вводить название, город или код..."}
                             value={searchValue}
@@ -110,9 +119,9 @@ import MapComponent from './MapComponent';
                             onKeyDown={handleKeyDown}
                             style={{...inputStyle, backgroundColor: selectedAirport ? '#e8f5e9' : 'white'}}
                             autoComplete="off"
-                            disabled={selectedAirport}
-                        />
+                            disabled={selectedAirport}/>
                         
+
                         {/* Выпадающий список подсказок */}
                         {suggestions.length > 0 && (
                             <div ref={suggestionsRef} style={suggestionsStyle}>
@@ -139,23 +148,19 @@ import MapComponent from './MapComponent';
                         )}
                     </div>
                     
+
                     {/* Кнопка очистки если аэропорт выбран */}
                     {selectedAirport ? (
                         <button 
                             onClick={handleClearAirport}
-                            style={{
-                                ...searchButtonStyle,
-                                backgroundColor: '#e74c3c'
-                            }}
+                            style={{...searchButtonStyle,backgroundColor: '#e74c3c'}}
                             title="Очистить">
                             ❌ Очистить
                         </button>
                     ) : (
                         <button 
                             onClick={() => {
-                                if (searchValue.trim()) {
-                                    fetchSuggestions(searchValue);
-                                }
+                                if (searchValue.trim()) {fetchSuggestions(searchValue);}
                             }}
                             style={searchButtonStyle}
                             disabled={loading}>
@@ -164,6 +169,7 @@ import MapComponent from './MapComponent';
                     )}
                 </div>
                 
+
                 {/* Подсказка под полем */}
                 <div style={{ fontSize: '0.9em', color: '#7f8c8d', marginTop: '5px' }}>
                     {selectedAirport 
@@ -173,55 +179,75 @@ import MapComponent from './MapComponent';
                 </div>
             </div>
 
+
             {/* Информация о выбранном аэропорте */}
             {selectedAirport && (
-                <div>
-                    <h3 style={{ marginTop: 0, color: '#27ae60' }}>
-                        ✓ Аэропорт выбран
-                    </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                        <div>
-                            <h4 style={{ marginBottom: '5px' }}>{selectedAirport.name}</h4>
-                            <p style={{ margin: 0 }}>
-                                <strong>Код ICAO:</strong> {selectedAirport.icao}
-                            </p>
-                            <p style={{ margin: 0 }}>
-                                <strong>Местоположение:</strong> {selectedAirport.city}, {selectedAirport.country}
-                            </p>
-                        </div>
-                        <div>
-                            <p style={{ margin: 0 }}>
-                                <strong>Широта:</strong> {selectedAirport.latitude.toFixed(4)}
-                            </p>
-                            <p style={{ margin: 0 }}>
-                                <strong>Долгота:</strong> {selectedAirport.longitude.toFixed(4)}
-                            </p>
-                        </div>
+            <div>
+                <h3 style={{ marginTop: 0, color: '#27ae60' }}>
+                    ✓ Аэропорт выбран</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                    <div>
+                        <h4 style={{ marginBottom: '5px' }}>{selectedAirport.name}</h4>
+                        <p style={{ margin: 0 }}><strong>Код ICAO:</strong> {selectedAirport.icao}</p>
+                        <p style={{ margin: 0 }}><strong>Местоположение:</strong> {selectedAirport.city}, {selectedAirport.country}</p>
+                    </div>
+                    <div>
+                        <p style={{ margin: 0 }}><strong>Широта:</strong> {selectedAirport.latitude.toFixed(4)}</p>
+                        <p style={{ margin: 0 }}><strong>Долгота:</strong> {selectedAirport.longitude.toFixed(4)}</p>
                     </div>
                 </div>
-            )}
+            </div>
+        )}
 
-            {/* Карта */}
-            <div style={mapContainerStyle}> 
+
+        {/* Карта */}
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}> 
+        {/* Карта занимает большую часть */}
+            <div style={{ flex: 1 }}>
                 <MapComponent airports={selectedAirport ? [selectedAirport] : []} />
             </div>
 
-            {/* Инструкция
-            <div style={instructionStyle}>
-                <p style={{ margin: 0 }}>
-                    <strong>💡 Как пользоваться:</strong> Введите название в поле выше → 
-                    выберите аэропорт из подсказок → он появится на карте. 
-                    Для выбора другого аэропорта нажмите "Очистить".
-                </p>
-            </div> */}
+
+            {/* Вертикальный ползунок справа от карты */}
+            {selectedAirport && (
+                <div style={sliderContainerStyle}>
+                    <div style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>
+                        Радиус: {radius} км
+                    </div>
+                    <input
+                        type="range"
+                        min="50"
+                        max="2000"
+                        step="50"
+                        value={radius}
+                        onChange={handleRadiusChange}
+                        style={verticalSliderStyle}
+                        />
+                    <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center',
+                        marginTop: '10px',
+                        fontSize: '0.8em',
+                        color: '#666'}}>
+                        <span>2000 км</span>
+                        <span>↓</span>
+                        <span>1000 км</span>
+                        <span>↓</span>
+                        <span>50 км</span>
+                    </div>
+                </div>
+            )}
         </div>
-    );
+        
+    </div>
+    
+);
 };
 
             
 
 // Стили вынесены для читаемости
-
 
 const inputStyle = {
     width: '100%',
@@ -252,6 +278,7 @@ const suggestionItemStyle = {
     padding: '10px',
     cursor: 'pointer',
     borderBottom: '1px solid #eee'
+
 };
 
 const searchButtonStyle = {
@@ -265,47 +292,55 @@ const searchButtonStyle = {
     whiteSpace: 'nowrap'
 };
 
-const selectedAirportsStyle = {
-    padding: '15px',
-    backgroundColor: '#ecf0f1',
-    borderRadius: '6px',
-    marginBottom: '20px'
-};
 
-const airportTagStyle = {
-    padding: '8px 12px',
-    backgroundColor: 'white',
-    borderRadius: '20px',
-    border: '1px solid #bdc3c7',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '14px'
-};
 
-const removeButtonStyle = {
-    background: 'none',
-    border: 'none',
-    color: '#e74c3c',
-    cursor: 'pointer',
-    fontSize: '18px',
-    padding: '0 5px'
-};
-
-const mapContainerStyle = {
-    backgroundColor: 'white',
+const sliderContainerStyle = {
+    marginLeft: '20px',
     padding: '20px',
+    backgroundColor: '#f5f7fa',
     borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: '550px', // Примерно такая же высота как у карты
+    justifyContent: 'center'
 };
 
-const instructionStyle = {
-    marginTop: '20px',
-    marginBottom: '40px',
-    padding: '15px',
-    backgroundColor: '#fffde7',
-    borderRadius: '6px',
-    borderLeft: '4px solid #f1c40f'
-
+const verticalSliderStyle = {
+    // WebkitAppearance: 'none',
+    width: '100px',
+    height: '300px',
+    background: 'linear-gradient(to bottom, #2ecc71, #f1c40f, #e74c3c)',
+    outline: 'none',
+    borderRadius: '10px',
+    WritingMode: 'vertical-lr',
+    transform: 'rotate(-90deg)', // Чтобы движение вверх было увеличением
+    cursor: 'pointer',
+    
+    // Стиль для бегунка
+    // '&::WebkitSliderThumb': {
+    //     WebkitAppearance: 'none',
+    //     width: '30px',
+    //     height: '30px',
+    //     background: '#3498db',
+    //     borderRadius: '50%',
+    //     border: '2px solid white',
+    //     boxShadow: '0 0 5px rgba(0,0,0,0.3)',
+    //     cursor: 'pointer'
+    // },
+    // '&::MozRangeThumb': {
+    //     width: '30px',
+    //     height: '30px',
+    //     background: '#3498db',
+    //     borderRadius: '50%',
+    //     border: '2px solid white',
+    //     boxShadow: '0 0 5px rgba(0,0,0,0.3)',
+    //     cursor: 'pointer'
+    // }
 };
+
+
+
+
 
 export default AirportMapPage;
