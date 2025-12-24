@@ -8,6 +8,10 @@ const [suggestions, setSuggestions] = useState([]);
 const [selectedAirport, setSelectedAirport] = useState(null); // Только один!
 const [loading, setLoading] = useState(false);
 const [radius, setRadius] = useState(100);
+
+const [airportsInRadius, setAirportsInRadius] = useState([]);
+const [loadingAirports, setLoadingAirports] = useState(false);
+
 const suggestionsRef = useRef(null);
 const inputRef = useRef(null);
 
@@ -24,7 +28,7 @@ const fetchSuggestions = async (query) => {
                 `/api/airport-autocomplete/?q=${encodeURIComponent(query)}`
         );
         
-        if (!response.ok) throw new Error('API error');
+        if (!response.ok) throw new Error('API1 error');
         
         const data = await response.json();
         setSuggestions(data.results || []);
@@ -35,6 +39,34 @@ const fetchSuggestions = async (query) => {
         setLoading(false);
     }
 };
+// Функция для получения аэропортов в радиусе
+const fetchAirportsInRadius = async () => {
+    if (!selectedAirport) return;
+    
+    setLoadingAirports(true);
+    try {
+        const response = await fetch(
+            `/api/airports-in-radius/?lat=${selectedAirport.latitude}&lon=${selectedAirport.longitude}&radius=${radius}`
+        );
+        
+        if (!response.ok) throw new Error('API2 error');
+        
+        const data = await response.json();
+        setAirportsInRadius(data.airports || []);
+        
+    } catch (error) {
+        console.error('Error fetching airports in radius:', error);
+        setAirportsInRadius([]);
+    } finally {
+        setLoadingAirports(false);
+    }
+};
+//при изменении радиуса или аэропорта все расстояния пересчитываем
+useEffect(() => {
+    if (selectedAirport && radius > 0) {
+        fetchAirportsInRadius();
+    }
+}, [selectedAirport, radius]);
 
 // Дебаунс для запросов
 useEffect(() => {
@@ -198,6 +230,9 @@ const handleKeyDown = (e) => {
                 </div>
             </div>
         )}
+        <div style={{ color: '#2ecc71', fontWeight: 'bold' }}>
+                 Найдено: {airportsInRadius.length} аэропортов
+        </div>
 
 
         {/* Карта */}
@@ -205,7 +240,7 @@ const handleKeyDown = (e) => {
         {/* Карта занимает большую часть */}
             <div style={{ flex: 1 }}>
                 <MapComponent 
-                    airports={selectedAirport ? [selectedAirport] : []}
+                    airports={selectedAirport ? [selectedAirport, ...airportsInRadius] : []}
                     radius={radius} // ← передаем значение радиуса
                     centerAirport={selectedAirport} // ← опционально, для будущих улучшений
                  />

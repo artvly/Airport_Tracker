@@ -25,5 +25,6 @@ urlpatterns = [
     path('all_airports/', include('frontend.urls') ),
     path('api/airport-autocomplete/', views.autocomplete_airports, name='airport_autocomplete'),
     path('api/airport/<str:icao_code>/', views.get_airport_coordinates, name='airport_coordinates'),
+    path('api/airports-in-radius/', views.airports_in_radius, name='airports_in_radius') # API для получения аэропортов в радиусе
     # path('api/', include('flights.urls')) 
 ]

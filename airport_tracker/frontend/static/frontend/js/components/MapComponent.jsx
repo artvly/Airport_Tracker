@@ -153,7 +153,37 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flight
 
             markerLayer.current.getSource().addFeature(centerMarker);
         }
+        // Создаем маркеры для всех аэропортов
+        airports.forEach(airport => {
+            if (airport.latitude && airport.longitude) {
+                const isCenter = centerAirport && airport.icao === centerAirport.icao;
+                
+                const marker = new Feature({
+                    geometry: new Point(
+                        fromLonLat([airport.longitude, airport.latitude])
+                    ),
+                    name: airport.name,
+                    isCenter: isCenter
+                });
 
+                // Разный стиль для центрального и обычных аэропортов
+                const style = new Style({
+                    image: new CircleStyle({
+                        radius: isCenter ? 10 : 6,
+                        fill: new Fill({
+                            color: isCenter ? 'rgba(231, 76, 60, 0.8)' : 'rgba(52, 152, 219, 0.6)'
+                        }),
+                        stroke: new Stroke({
+                            color: isCenter ? 'rgba(192, 57, 43, 1)' : 'rgba(41, 128, 185, 1)',
+                            width: isCenter ? 3 : 2
+                        })
+                    })
+                });
+
+                marker.setStyle(style);
+                markerLayer.current.getSource().addFeature(marker);
+            }
+        });
         // Центрируем карту на центральном аэропорте
         if (centerAirport) {
             const zoomLevel = radius > 1000 ? 5 : radius > 500 ? 6 : radius > 200 ? 7 : 8;

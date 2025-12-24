@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from flights.models import Airport  
 from .forms import AirportSearchForm
 from django.http import JsonResponse
+import math
 
 def index(request):
     return render(request, 'frontend/index.html')
@@ -108,3 +109,50 @@ def autocomplete_airports(request):
     
 
     return JsonResponse({'results': results})
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    # Вычисляет расстояние между двумя точками на Земле в км
+    R = 6371  # радиус Земли в км
+    
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    
+    a = (math.sin(delta_lat/2)**2 + 
+         math.cos(lat1_rad) * math.cos(lat2_rad) * 
+         math.sin(delta_lon/2)**2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    
+    return R * c
+
+def airports_in_radius(request):
+# Возвращает аэропорты в радиусе от заданной точки
+    lat = float(request.GET.get('lat'))
+    lon = float(request.GET.get('lon'))
+    radius = float(request.GET.get('radius'))
+
+    all_airports = Airport.objects.all()
+
+    airports_in_radius = []
+    for airport in all_airports:
+        # Вычисляем расстояние
+        distance = haversine_distance(lat, lon,airport.latitude, airport.longitude)
+        
+        if distance <= radius:
+            airports_in_radius.append({
+                'name': airport.name,
+                'icao': airport.icao_code,
+                'iata': airport.iata_code,
+                'latitude': airport.latitude,
+                'longitude': airport.longitude,
+                'city': airport.city,
+                'country': airport.country,
+                'distance': round(distance, 2)
+            })
+
+    return JsonResponse({
+        'success': True,
+        'count': len(airports_in_radius),
+        'airports': airports_in_radius
+    })
