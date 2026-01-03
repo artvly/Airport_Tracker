@@ -23,3 +23,7 @@
   text-align: center;
   white-space: nowrap;
 }
+.search-container{
+  position: absolute;
+  text-align: center;
+}

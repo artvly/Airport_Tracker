@@ -1,7 +1,9 @@
 // import {ChaoticShape} from '../utils/ChaoticShape.js';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect,suggestions,suggestionsRef,suggestionsStyle } from 'react';
 import '../../css/bootstrap.css';
 import '../../css/canvasoverlay.css';
+import { inputRef,selectedAirport,handleKeyDown,inputStyle,fetchSuggestions,searchValue  }  from './AirportMapPage';
+
 
 const Particles = ({onMapClick}) => {
     const canvasRef = useRef(null);
@@ -285,12 +287,14 @@ const Particles = ({onMapClick}) => {
                 <button className="overlay-button" onClick={handle_about_btn}>О нас</button>
                 <button className="overlay-button" >Как пользоваться</button>
                 <button className="overlay-button" onClick={handle_available_airports_btn}>Доступные аэропорты</button>
-                <button className="overlay-button" >В процессе</button>
             </div>
 
-            <canvas ref={canvasRef} id="shapesCanvas"></canvas>
+             <canvas ref={canvasRef} id="shapesCanvas"></canvas>
             <div className="search-container">    
-                <div className="search-input-wrapper">
+                <button className="search-button" onClick={handleSearch}>
+                        🔍
+                    </button>
+                {/* <div className="search-input-wrapper">
                     <input 
                         type="text" 
                         className="search-input" 
@@ -298,10 +302,8 @@ const Particles = ({onMapClick}) => {
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                     />
-                    <button className="search-button" onClick={handleSearch}>
-                        🔍
-                    </button>
-                </div>
+                    
+                </div> */}
             </div>
 
         </div>

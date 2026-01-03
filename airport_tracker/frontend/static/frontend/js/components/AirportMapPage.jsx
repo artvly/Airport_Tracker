@@ -22,7 +22,7 @@ const [loadingFlights, setLoadingFlights] = useState(false);
 
 // Функция для получения подсказок
 const fetchSuggestions = async (query) => {
-    if (query.length < 2) {
+    if (query.x < 2) {
         setSuggestions([]);
         return;
     }
@@ -174,7 +174,6 @@ const handleKeyDown = (e) => {
     }
 };
     return (
-    
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
                 <h1 onClick={()=>(history.push('/'))} 
                 style={{ color: '#ddd', marginTop: '60px'}}> {/**/}
@@ -184,7 +183,7 @@ const handleKeyDown = (e) => {
 
 
             {/* Поиск с автоподсказками */}
-            <div style={{ position: 'relative', marginBottom: '20px' }} > {/*2*/}
+            <div style={{ position: 'relative', marginBottom: '20px' }} >
                 <div style={{ display: 'flex' }}>
                     <div style={{ position: 'relative',width:'100%'}}>
                         <input ref={inputRef} type="text" 
@@ -325,7 +324,6 @@ const handleKeyDown = (e) => {
         </div>
         
     </div>
-    
 );
 };
 
@@ -386,7 +384,7 @@ const sliderContainerStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    height: '550px', // Примерно такая же высота как у карты
+    // height: '550px', // Примерно такая же высота как у карты
     justifyContent: 'center'
 };
 
