@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef} from 'react';
 import MapComponent from './MapComponent';
 
  
-const AirportMapPage = ({history}) => {
-const [searchValue, setSearchValue] = useState('');//значение с поисковика в данный момент времени
+const AirportMapPage = ({location,history}) => {
+
+const initialSearch = location.state?.search || '';
+
+const [searchValue, setSearchValue] = useState(initialSearch);//значение с поисковика в данный момент времени
 const [suggestions, setSuggestions] = useState([]);
 const [selectedAirport, setSelectedAirport] = useState(null); // Только один!
 const [loading, setLoading] = useState(false);
@@ -19,6 +22,16 @@ const inputRef = useRef(null);
 
 const [flights, setFlights] = useState([]);
 const [loadingFlights, setLoadingFlights] = useState(false);
+
+
+
+useEffect(() => {
+        if (initialSearch) {
+            if (searchValue.trim()) {fetchSuggestions(searchValue);
+            console.log('ИщемЫ по запросу:', initialSearch);
+        }
+    }
+    }, [initialSearch]);
 
 // Функция для получения подсказок
 const fetchSuggestions = async (query) => {
@@ -44,6 +57,7 @@ const fetchSuggestions = async (query) => {
         setLoading(false);
     }
 };
+
 // Функция для получения аэропортов в радиусе
 const fetchAirportsInRadius = async () => {
     if (!selectedAirport) return;
@@ -103,6 +117,7 @@ const fetchFlights = async () => {
         setLoadingFlights(false);
     }
 };
+
 //при изменении радиуса или аэропорта все расстояния пересчитываем
 useEffect(() => {
     if (selectedAirport && radius > 0) {
@@ -150,8 +165,6 @@ const handleSelectAirport = (airport) => {
         city: airport.city,
         country: airport.country
     };
-
-
     
     setSelectedAirport(airportWithCoords); // Заменяем, а не добавляем
     setSearchValue(airport.name); // Показываем название в поле

@@ -9,6 +9,12 @@ const Particles = ({onMapClick}) => {
     const canvasRef = useRef(null);
     const [searchValue, setSearchValue] = useState('');
 
+    //для подсказок
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const suggestionsRef = useRef(null);
+    const inputRef = useRef(null);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -255,15 +261,7 @@ const Particles = ({onMapClick}) => {
         };
     }, []);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (onMapClick) {
-                onMapClick();
-        } 
-        else {
-            window.location.href = '/map'; // Fallback
-        }
-    };
+   
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -278,6 +276,79 @@ const Particles = ({onMapClick}) => {
         window.location.href='/all_airports/';
 
     };
+    
+    // Функция для получения подсказок
+    const fetchSuggestions = async (query) => {
+        if (query.length < 2) {
+            setSuggestions([]);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `/api/airport-autocomplete/?q=${encodeURIComponent(query)}`
+            );
+            
+            if (!response.ok) throw new Error('API error');
+            
+            const data = await response.json();
+            setSuggestions(data.results || []);
+        } catch (error) {
+            console.error('Autocomplete error:', error);
+            setSuggestions([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Дебаунс для запросов
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchSuggestions(searchValue);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchValue]);
+
+    // Клик вне подсказок - скрываем их
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (suggestionsRef.current && 
+                !suggestionsRef.current.contains(event.target) &&
+                inputRef.current && 
+                !inputRef.current.contains(event.target)) {
+                setSuggestions([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Выбор аэропорта из подсказок
+    const handleSelectAirport = (airport) => {
+    
+        console.log('Выбран аэропорт:', airport);
+        setSearchValue(airport.name);
+        setSuggestions([]);
+        // if (onMapClick) {
+        //     onMapClick(airport.name); 
+        // }
+        
+    };
+
+    //Нажате на поисковую кнопку
+     const handleSearch = (e) => {
+        e.preventDefault();
+        if (onMapClick) {
+                onMapClick(searchValue);
+        } 
+        else {
+            onMapClick(airport);
+            window.location.href = '/map'; // Fallback
+        }
+    };
   
 
     return (
@@ -290,20 +361,70 @@ const Particles = ({onMapClick}) => {
             </div>
 
              <canvas ref={canvasRef} id="shapesCanvas"></canvas>
-            <div className="search-container">    
-                <button className="search-button" onClick={handleSearch}>
-                        🔍
-                    </button>
-                {/* <div className="search-input-wrapper">
+           <div className="search-container">
+                <div className="search-input-wrapper" style={{ position: 'relative' }}>
                     <input 
+                        ref={inputRef}
                         type="text" 
                         className="search-input" 
-                        placeholder="Search airports..."
+                        placeholder="Найти аэропорт..."
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        autoComplete="off"
                     />
-                    
-                </div> */}
+                    <button className="search-button" onClick={handleSearch}>
+                        {loading ? '⏳' : '🔍'}
+                    </button>
+
+                    {/* Выпадающий список подсказок */}
+                    {suggestions.length > 0 && (
+                        <div 
+                            ref={suggestionsRef}
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                backgroundColor: 'white',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                zIndex: 1000,
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                marginTop: '5px'
+                            }}>
+                            {suggestions.map((airport, index) => (
+                                <div 
+                                    key={`${airport.icao}-${index}`}
+                                    onClick={() => handleSelectAirport(airport)}
+                                    style={{
+                                        padding: '10px',
+                                        cursor: 'pointer',
+                                        borderBottom: '1px solid #eee'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f8ff'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                >
+                                    <div style={{ fontWeight: 'bold', color: '#3498db' }}>
+                                        {airport.name} 
+                                        <span style={{ 
+                                            marginLeft: '10px', 
+                                            fontFamily: 'monospace', 
+                                            color: '#004878ff'
+                                        }}>
+                                            {airport.icao}
+                                        </span>
+                                    </div>
+                                    <div style={{ fontSize: '0.9em', color: '#7f8c8d' }}>
+                                        📍 {airport.city}, {airport.country}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
         </div>

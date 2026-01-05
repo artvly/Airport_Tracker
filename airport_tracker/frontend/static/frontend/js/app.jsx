@@ -8,9 +8,12 @@ import { useHistory } from 'react-router-dom';
 
 const HomePageWrapper = () => {
     const history = useHistory(); // Работает потому что внутри Router
-    const handle_onMapClick = () => {
+    const handle_onMapClick = (searchAirport) => {
         console.log(' Переход на /map');
-        history.push('/map');
+        history.push(
+            {pathname:'/map',state: { search: searchAirport || '' }}
+        
+        );
     };
     return (
         <Particles onMapClick={handle_onMapClick} />

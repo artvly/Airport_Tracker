@@ -84,6 +84,8 @@ def search_results(request):
         'total_results': airports.count()
     })
 
+
+#для автокомплита аэропортов
 def autocomplete_airports(request):
 
     query = request.GET.get('q', '').strip()
@@ -117,10 +119,11 @@ def autocomplete_airports(request):
 
     return JsonResponse({'results': results})
 
+# Вычисляет расстояние между двумя точками на Земле в км
 def haversine_distance(lat1, lon1, lat2, lon2):
-    # Вычисляет расстояние между двумя точками на Земле в км
-    R = 6371  # радиус Земли в км
     
+    R = 6371  # радиус Земли в км
+   
     lat1_rad = math.radians(lat1)
     lat2_rad = math.radians(lat2)
     delta_lat = math.radians(lat2 - lat1)
@@ -133,8 +136,9 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     
     return R * c
 
-def airports_in_radius(request):
 # Возвращает аэропорты в радиусе от заданной точки
+def airports_in_radius(request):
+
     lat = float(request.GET.get('lat'))
     lon = float(request.GET.get('lon'))
     radius = float(request.GET.get('radius'))
@@ -164,9 +168,9 @@ def airports_in_radius(request):
         'airports': airports_in_radius
     })
 
-
+# API для получения рейсов для аэропорта
 def get_flights_for_airport(request):
-    # API для получения рейсов для аэропорта
+    
     try:
         airport_icao = request.GET.get('icao')
         radius = float(request.GET.get('radius', 500))
@@ -240,9 +244,10 @@ def get_flights_for_airport(request):
         }, status=500)
 
 
+ # API для получения рейсов между центральным аэропортом и аэропортами в радиусе
 @csrf_exempt
 def get_flights_with_radius(request):
-    # API для получения рейсов между центральным аэропортом и аэропортами в радиусе
+   
     try:
         # Получаем параметры из запроса
         center_icao = request.GET.get('center_icao', '').upper()
@@ -378,8 +383,8 @@ def get_flights_with_radius(request):
             'error': str(e)
         }, status=500)
 
+# Генерация тестовых рейсов
 def generate_mock_flights(center_icao, airports_in_radius, max_flights=5):
-    # Генерация тестовых рейсов
     flights = []
     airlines = ['SU', 'LH', 'AF', 'BA', 'AA', 'U6', 'S7']
     
