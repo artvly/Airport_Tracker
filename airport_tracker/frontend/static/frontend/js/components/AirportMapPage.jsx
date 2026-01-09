@@ -397,12 +397,10 @@ const sliderContainerStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    // height: '550px', // Примерно такая же высота как у карты
     justifyContent: 'center'
 };
 
 const verticalSliderStyle = {
-    // WebkitAppearance: 'none',
     width: '100px',
     height: '300px',
     background: 'linear-gradient(to bottom, #2ecc71, #f1c40f, #e74c3c)',
@@ -411,27 +409,6 @@ const verticalSliderStyle = {
     WritingMode: 'vertical-lr',
     transform: 'rotate(-90deg)', // Чтобы движение вверх было увеличением
     cursor: 'pointer',
-    
-    // Стиль для бегунка
-    // '&::WebkitSliderThumb': {
-    //     WebkitAppearance: 'none',
-    //     width: '30px',
-    //     height: '30px',
-    //     background: '#3498db',
-    //     borderRadius: '50%',
-    //     border: '2px solid white',
-    //     boxShadow: '0 0 5px rgba(0,0,0,0.3)',
-    //     cursor: 'pointer'
-    // },
-    // '&::MozRangeThumb': {
-    //     width: '30px',
-    //     height: '30px',
-    //     background: '#3498db',
-    //     borderRadius: '50%',
-    //     border: '2px solid white',
-    //     boxShadow: '0 0 5px rgba(0,0,0,0.3)',
-    //     cursor: 'pointer'
-    // }
 };
 
 

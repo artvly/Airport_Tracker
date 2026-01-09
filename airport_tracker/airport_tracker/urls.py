@@ -16,17 +16,29 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from frontend import views
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+
     path('',views.index,name='home'), #home,main
     path('about/',views.about,name='about'), #о нас
     path('all_airports/', views.available_airports,name='available_airports'),#все доступные аэропорты
+    
+    
     path('all_airports/', include('frontend.urls') ),
+    
+    
     path('api/airport-autocomplete/', views.autocomplete_airports, name='airport_autocomplete'),
     path('api/airport/<str:icao_code>/', views.get_airport_coordinates, name='airport_coordinates'),
     path('api/flights/', views.get_flights_for_airport, name='get_flights'),
     path('api/airports-in-radius/', views.airports_in_radius, name='airports_in_radius'), 
     path('api/flights-with-radius/',views.get_flights_with_radius,name='get_flights_with_radius')# API для получения аэропортов в радиусе 
     # path('api/', include('flights.urls')) 
+
+   
 ]

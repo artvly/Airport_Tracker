@@ -8,6 +8,8 @@ from django.core.cache import cache
 import logging
 import math
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -169,6 +171,7 @@ def airports_in_radius(request):
     })
 
 # API для получения рейсов для аэропорта
+@api_view(['GET'])
 def get_flights_for_airport(request):
     
     try:
