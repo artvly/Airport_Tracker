@@ -357,15 +357,15 @@ def get_flights_with_radius(request):
             flights_data = flights_from_db
             logger.info(f"Найдено {len(flights_data)} рейсов из БД")
             print(f"Найдено {len(flights_data)} рейсов из БД", flush=True)
-        # else:
-        #     logger.info('ГЕНЕРИРУЮ!')
-        #     # Генерируем тестовые рейсы
-        #     flights_data = generate_mock_flights(
-        #         center_icao, 
-        #         airports_in_radius_list,
-        #         max_flights=min(20, len(airports_in_radius_list))
-        #     )
-        #     logger.info(f"Сгенерировано {len(flights_data)} тестовых рейсов")
+        else:
+            print('ГЕНЕРИРУЮ!',flush=True)
+            # Генерируем тестовые рейсы
+            flights_data = generate_mock_flights(
+                center_icao, 
+                airports_in_radius_list,
+                max_flights=min(30, len(airports_in_radius_list))
+            )
+            logger.info(f"Сгенерировано {len(flights_data)} тестовых рейсов")
         
         return JsonResponse({
             'success': True,

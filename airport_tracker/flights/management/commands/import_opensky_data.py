@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from airports.models import Airport, Flight
-from airports.services.opensky_service import OpenSkyService
+from flights.models import Airport, Flight
+from flights.management.opensky_service import OpenSkyService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             # Импорт для всех аэропортов в БД
             airports = Airport.objects.all()[:10]  # Ограничим для теста
             for airport in airports:
-                self.import_flights_for_airport(opensky, airport.icao, hours)
+                self.import_flights_for_airport(opensky, airport.icao_code, hours)
     
     def import_flights_for_airport(self, opensky, airport_icao, hours):
         """Импорт рейсов для конкретного аэропорта"""
@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 return
             
             airport, _ = Airport.objects.get_or_create(
-                icao=airport_icao,
+                icao_code=airport_icao,
                 defaults={
                     'name': f'Аэропорт {airport_icao}',
                     'city': 'Неизвестно',
@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 return
             
             other_airport, _ = Airport.objects.get_or_create(
-                icao=other_airport_icao,
+                icao_code=other_airport_icao,
                 defaults={
                     'name': f'Аэропорт {other_airport_icao}',
                     'city': 'Неизвестно',
