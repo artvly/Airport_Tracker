@@ -22,11 +22,12 @@ class OpenSkyService:
         cached_data = cache.get(cache_key)
         
         if cached_data:
-            logger.info(f"Используем кэшированные данные для {airport_icao}")
+            print(f"Используем кэшированные данные для {airport_icao}",flush=True)
             return cached_data
         
         try:
             # Получаем рейсы за последние N часов
+            print(f"Получаем рейсы за последние N часов {airport_icao}",flush=True)
             end_time = int(timezone.now().timestamp())
             start_time = end_time - (hours * 3600)
             
@@ -42,7 +43,7 @@ class OpenSkyService:
             else:
                 auth = None
             
-            logger.info(f"Запрашиваем данные OpenSky для {airport_icao}")
+            print(f"Запрашиваем данные OpenSky для {airport_icao}",flush=True)
             response = self.session.get(url, params=params, auth=auth, timeout=30)
             
             if response.status_code == 200:

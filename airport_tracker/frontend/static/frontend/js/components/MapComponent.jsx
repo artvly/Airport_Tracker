@@ -1,5 +1,4 @@
-// MapComponent.jsx
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
@@ -51,6 +50,7 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flight
         
         return new CircleGeometry(center, radiusKm * 1000); // OpenLayers использует метры
     };
+
 
     useEffect(() => {
         // Инициализация карты
@@ -144,7 +144,7 @@ const MapComponent = ({ airports = [], centerAirport = null, radius = 50, flight
             centerMarker.setStyle(new Style({
                 image: new Icon({
                     src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // или другая иконка
-                    scale: 0.15, // чуть больше обычных
+                    scale: 0.1, // чуть больше обычных
                     anchor: [0.5, 1],
                     anchorXUnits: 'fraction',
                     anchorYUnits: 'fraction'

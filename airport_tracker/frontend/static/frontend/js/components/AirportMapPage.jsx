@@ -91,7 +91,7 @@ const fetchFlights = async () => {
     console.log(`Запрашиваем рейсы для ${selectedAirport.icao} с радиусом ${radius}км`);
     
     try {
-        // Используем ваш API для получения рейсов
+        // Используем API для получения рейсов
         const response = await fetch(
             `/api/flights-with-radius/?center_icao=${selectedAirport.icao}&radius=${radius}`
         );
@@ -342,7 +342,7 @@ const handleKeyDown = (e) => {
 
             
 
-// Стили вынесены для читаемости
+// Стили
 
 const inputStyle = {
     width: '100%',

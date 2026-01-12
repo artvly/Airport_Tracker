@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 def index(request):
     return render(request, 'frontend/index.html')
 
+@csrf_exempt
 def about(request):
     return render(request,'frontend/about.html')
 
+@csrf_exempt
 def available_airports(request):
     airports_list = Airport.objects.all().order_by('name')
     
@@ -79,7 +81,7 @@ def search_results(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'frontend/search_results.html', {
+    return render(request, { ##после request стояло 'frontend/search_results.html',
         'form': form,
         'page_obj': page_obj,
         'query': query if 'query' in locals() else '',
@@ -188,6 +190,7 @@ def get_flights_for_airport(request):
         try:
             center_airport = Airport.objects.get(icao=airport_icao)
         except Airport.DoesNotExist:
+            logger.info('апишка не раб')
             return JsonResponse({
                 'success': False,
                 'error': 'Аэропорт не найден'
@@ -226,6 +229,8 @@ def get_flights_for_airport(request):
                             'duration': flight_data.get('lastSeen', 0) - flight_data.get('firstSeen', 0),
                             'icao24': flight_data.get('icao24', '')
                         })
+        else:
+            logger.error('Пустой opensky-data!')
         
         return JsonResponse({
             'success': True,
@@ -249,6 +254,7 @@ def get_flights_for_airport(request):
 
  # API для получения рейсов между центральным аэропортом и аэропортами в радиусе
 @csrf_exempt
+@api_view(['GET'])
 def get_flights_with_radius(request):
    
     try:
@@ -256,7 +262,7 @@ def get_flights_with_radius(request):
         center_icao = request.GET.get('center_icao', '').upper()
         radius_km = float(request.GET.get('radius', 500))
         
-        logger.info(f"Запрос рейсов: center={center_icao}, radius={radius_km}km")
+        print(f"Запрос рейсов: center={center_icao}, radius={radius_km}km", flush=True)
         
         if not center_icao:
             return JsonResponse({
@@ -272,11 +278,12 @@ def get_flights_with_radius(request):
                 'success': False,
                 'error': f'Аэропорт {center_icao} не найден'
             }, status=404)
-        
+         
         # 2. Находим все аэропорты в радиусе
         airports_in_radius_list = []
-        all_airports = Airport.objects.exclude(icao_code=center_icao)
         
+        all_airports = Airport.objects.exclude(icao_code=center_icao)
+        # print(f"{len(all_airports)}", flush=True)
         for airport in all_airports:
             distance = haversine_distance(
                 center_airport.latitude, 
@@ -285,6 +292,7 @@ def get_flights_with_radius(request):
                 airport.longitude
             )
             if distance <= radius_km:
+                # print(f"{airport.icao_code}", flush=True)
                 airports_in_radius_list.append({
                     'icao': airport.icao_code,
                     'name': airport.name,
@@ -294,14 +302,13 @@ def get_flights_with_radius(request):
                     'country': airport.country,
                     'distance_km': round(distance, 2)
                 })
-        
+        print(f"Аэропорты в радиусе:{len(airports_in_radius_list)}", flush=True)
         # 3. Получаем рейсы из БД для центрального аэропорта
         flights_from_db = []
         
         # Рейсы ИЗ центрального аэропорта
-        departure_flights = Flight.objects.filter(
-            departure_airport__icao_code=center_icao
-        ).select_related('arrival_airport')
+        departure_flights = Flight.objects.filter(departure_airport__icao_code=center_icao).select_related('arrival_airport')
+        print(f"Рейсы в из центрального аэропорта:{len(departure_flights)}", flush=True)
         
         for flight in departure_flights:
             # Проверяем, находится ли аэропорт назначения в радиусе
@@ -319,6 +326,7 @@ def get_flights_with_radius(request):
                     'duration_min': flight.duration_minutes if hasattr(flight, 'duration_minutes') else 0,
                     'source': 'database'
                 })
+                print('добавляю в flights_from_db',flush=True)
         
         # Рейсы В центральный аэропорт
         arrival_flights = Flight.objects.filter(
@@ -344,17 +352,20 @@ def get_flights_with_radius(request):
         
         # 4. Если в БД нет рейсов, используем тестовые данные
         flights_data = []
+        print(f"Найдено {len(flights_from_db)} рейсов из БД", flush=True)
         if flights_from_db:
             flights_data = flights_from_db
             logger.info(f"Найдено {len(flights_data)} рейсов из БД")
-        else:
-            # Генерируем тестовые рейсы
-            flights_data = generate_mock_flights(
-                center_icao, 
-                airports_in_radius_list,
-                max_flights=min(20, len(airports_in_radius_list))
-            )
-            logger.info(f"Сгенерировано {len(flights_data)} тестовых рейсов")
+            print(f"Найдено {len(flights_data)} рейсов из БД", flush=True)
+        # else:
+        #     logger.info('ГЕНЕРИРУЮ!')
+        #     # Генерируем тестовые рейсы
+        #     flights_data = generate_mock_flights(
+        #         center_icao, 
+        #         airports_in_radius_list,
+        #         max_flights=min(20, len(airports_in_radius_list))
+        #     )
+        #     logger.info(f"Сгенерировано {len(flights_data)} тестовых рейсов")
         
         return JsonResponse({
             'success': True,
