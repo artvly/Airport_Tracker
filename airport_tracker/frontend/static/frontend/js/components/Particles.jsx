@@ -276,6 +276,9 @@ const Particles = ({onMapClick}) => {
         window.location.href='/all_airports/';
 
     };
+    const handle_howToUse_btn=()=>{
+        window.location.href='/howToUse/';
+    }
     
     // Функция для получения подсказок
     const fetchSuggestions = async (query) => {
@@ -356,7 +359,7 @@ const Particles = ({onMapClick}) => {
             
             <div className="CanvasOverlayContainer">
                 <button className="overlay-button" onClick={handle_about_btn}>О нас</button>
-                <button className="overlay-button" >Как пользоваться</button>
+                <button className="overlay-button" onClick={handle_howToUse_btn}>Как пользоваться</button>
                 <button className="overlay-button" onClick={handle_available_airports_btn}>Доступные аэропорты</button>
             </div>
 

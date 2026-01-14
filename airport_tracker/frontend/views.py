@@ -13,15 +13,19 @@ from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
-@csrf_exempt
+
 def index(request):
     return render(request, 'frontend/index.html')
 
-@csrf_exempt
+
 def about(request):
     return render(request,'frontend/about.html')
 
-@csrf_exempt
+
+def howToUse(request):
+    return render(request, 'frontend/howToUse.html')
+
+
 def available_airports(request):
     airports_list = Airport.objects.all().order_by('name')
     
@@ -90,6 +94,7 @@ def search_results(request):
 
 
 #для автокомплита аэропортов
+@csrf_exempt
 def autocomplete_airports(request):
 
     query = request.GET.get('q', '').strip()
@@ -363,7 +368,7 @@ def get_flights_with_radius(request):
             flights_data = generate_mock_flights(
                 center_icao, 
                 airports_in_radius_list,
-                max_flights=min(30, len(airports_in_radius_list))
+                max_flights=min(30, len(airports_in_radius_list)) #тут можно менять количество минимального количеества генерируеймых рейсов
             )
             logger.info(f"Сгенерировано {len(flights_data)} тестовых рейсов")
         

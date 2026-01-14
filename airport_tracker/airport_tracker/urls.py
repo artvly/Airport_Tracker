@@ -27,6 +27,7 @@ urlpatterns = [
 
     path('',views.index,name='home'), #home,main
     path('about/',views.about,name='about'), #о нас
+    path('howToUse/',views.howToUse,name='howToUse'), #о нас
     path('all_airports/', views.available_airports,name='available_airports'),#все доступные аэропорты
     
     

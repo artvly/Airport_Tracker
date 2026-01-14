@@ -1,4 +1,3 @@
-# frontend/tests.py
 from django.test import TestCase, Client
 from django.urls import reverse
 from flights.models import Airport
@@ -19,25 +18,25 @@ class BasicViewsTests(TestCase):
         )
     
     def test_index_view(self):
-        """Тест главной страницы"""
+        # Тест главной страницы
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'frontend/index.html')
     
     def test_about_view(self):
-        """Тест страницы 'О нас'"""
+        # Тест страницы 'О нас'
         response = self.client.get('/about/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'frontend/about.html')
     
     def test_available_airports_view(self):
-        """Тест страницы со списком аэропортов"""
+        # Тест страницы со списком аэропортов   
         response = self.client.get('/all_airports/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'frontend/airports_list.html')
     
     def test_get_airport_coordinates_success(self):
-        """Тест получения координат аэропорта"""
+        # Тест получения координат аэропорта
         response = self.client.get('/api/airport/TEST/')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -45,28 +44,28 @@ class BasicViewsTests(TestCase):
         self.assertEqual(data['name'], 'Test Airport')
     
     def test_get_airport_coordinates_not_found(self):
-        """Тест получения координат несуществующего аэропорта"""
+        # Тест получения координат несуществующего аэропорта
         response = self.client.get('/api/airport/XXXX/')
         self.assertEqual(response.status_code, 404)
         data = json.loads(response.content)
         self.assertIn('error', data)
     
     def test_autocomplete_airports(self):
-        """Тест автодополнения"""
+        # Тест автодополнения
         response = self.client.get('/api/airport-autocomplete/?q=test')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertIn('results', data)
     
     def test_autocomplete_short_query(self):
-        """Тест автодополнения с коротким запросом"""
+        # Тест автодополнения с коротким запросом
         response = self.client.get('/api/airport-autocomplete/?q=t')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(data['results'], [])
     
     def test_airports_in_radius_success(self):
-        """Тест поиска аэропортов в радиусе"""
+        # Тест поиска аэропортов в радиусе
         response = self.client.get('/api/airports-in-radius/?lat=55.0&lon=37.0&radius=100')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -80,7 +79,7 @@ class BasicViewsTests(TestCase):
     #     self.assertIn(response.status_code, [400, 500])
     
     def test_get_flights_with_radius_success(self):
-        """Тест получения рейсов в радиусе"""
+        # Тест получения рейсов в радиусе
         response = self.client.get('/api/flights-with-radius/?center_icao=TEST&radius=100')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -88,14 +87,14 @@ class BasicViewsTests(TestCase):
         self.assertIn('flights', data)
     
     def test_get_flights_with_radius_no_airport(self):
-        """Тест получения рейсов без указания аэропорта"""
+        # Тест получения рейсов без указания аэропорта
         response = self.client.get('/api/flights-with-radius/')
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertFalse(data['success'])
     
     def test_get_flights_with_radius_invalid_airport(self):
-        """Тест получения рейсов с несуществующим аэропортом"""
+        # Тест получения рейсов с несуществующим аэропортом
         response = self.client.get('/api/flights-with-radius/?center_icao=XXXX&radius=100')
         self.assertEqual(response.status_code, 404)
         data = json.loads(response.content)
@@ -103,16 +102,16 @@ class BasicViewsTests(TestCase):
 
 
 class URLPatternsTests(TestCase):
-    """Тесты URL паттернов"""
+    #   Тесты URL паттернов
     
     def test_url_names(self):
-        """Проверка имен URL"""
+        # Проверка имен URL
         self.assertEqual(reverse('home'), '/')
         self.assertEqual(reverse('about'), '/about/')
         self.assertEqual(reverse('available_airports'), '/all_airports/')
     
     def test_all_urls_exist(self):
-        """Проверка что все URL работают"""
+        # Проверка что все URL работают
         urls = [
             '/',
             '/about/',
@@ -125,7 +124,7 @@ class URLPatternsTests(TestCase):
             self.assertNotEqual(response.status_code, 404, f"URL {url} вернул 404")
     
     def test_api_urls_return_json(self):
-        """Проверка что API URL возвращают JSON"""
+        # Проверка что API URL возвращают JSON
         Airport.objects.create(
             name="Test",
             icao_code="TEST",
@@ -147,15 +146,12 @@ class URLPatternsTests(TestCase):
 
 
 class ViewsErrorsTests(TestCase):
-    """Тесты обработки ошибок в views"""
+    # Тесты обработки ошибок в views
     
     def test_get_flights_for_airport_no_icao(self):
-        """Тест get_flights_for_airport без кода аэропорта"""
-        # Эта функция есть в views.py, но нет в urls.py
-        # Проверяем что она существует и возвращает ошибку
+        # Тест get_flights_for_airport без кода аэропорта
         from frontend import views
         
-        # Создаем mock запрос без параметра icao
         from django.test import RequestFactory
         factory = RequestFactory()
         request = factory.get('/')
@@ -167,20 +163,20 @@ class ViewsErrorsTests(TestCase):
         self.assertIn('Не указан код аэропорта', data['error'])
     
     def test_search_results_view(self):
-        """Тест search_results (есть в views, но нет в urls)"""
+        
         response = self.client.get('/search/?search=test')
         # Эта функция не подключена в urls.py, поэтому должен быть 404
         self.assertEqual(response.status_code, 404)
     
     def test_airport_map_view(self):
-        """Тест airport_map_view (есть в views, но нет в urls)"""
+        # Тест airport_map_view (есть в views, но нет в urls)
         response = self.client.get('/airport-map/')
         # Не подключено в urls.py
         self.assertEqual(response.status_code, 404)
 
 
 class ModelsRequiredTests(TestCase):
-    """Тесты, требующие модели"""
+    # Тесты, требующие модели
     
     def test_haversine_distance(self):
         """Тест функции расчета расстояния"""
@@ -195,7 +191,7 @@ class ModelsRequiredTests(TestCase):
         self.assertGreater(distance, 0)
     
     def test_generate_mock_flights(self):
-        """Тест генерации тестовых рейсов"""
+        # Тест генерации тестовых рейсов
         from frontend.views import generate_mock_flights
         
         airports = [
