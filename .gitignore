@@ -1,9 +1,27 @@
-task.pdf
-airport_tracker/airport_tracker/settings.py
-calma/
-others/
-*.pyc
-node_modules/
-*.json
-*.sqlite3
+# --- Секреты и окружение ---
+.env
 *.env
+venv/
+.venv/
+
+# --- Python / Django ---
+__pycache__/
+*.pyc
+.coverage
+*.sqlite3
+
+# --- Node ---
+node_modules/
+
+# --- IDE ---
+.vscode/
+.idea/
+
+# --- Большие данные (CSV с аэропортами загружается командой import_airports) ---
+airport_tracker/data/
+airport_tracker/flights/data/
+
+# --- Личные материалы, не относящиеся к коду проекта ---
+task.pdf
+others/
+zzz/
