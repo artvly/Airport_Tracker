@@ -1,0 +1,11 @@
+# Основные зависимости (Python 3.13, проверено на Django 5.2)
+Django==5.2.8
+djangorestframework==3.16.1
+drf-spectacular==0.29.0
+psycopg2-binary==2.9.11
+python-dotenv==1.2.1
+python-opensky==1.0.1
+requests==2.32.5
+
+# Для измерения покрытия тестами (необязательно)
+coverage==7.13.0
